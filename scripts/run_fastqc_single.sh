@@ -1,0 +1,19 @@
+#!/bin/bash
+#SBATCH --job-name=fastqc
+#SBATCH --partition=defq
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=800MB
+#SBATCH --time=01:00:00
+
+set -o errexit
+
+module --quiet purge
+module load FastQC/0.12.1-Java-11
+
+SEQPATH=$1
+QCPATH=$2
+
+for i in ${SEQPATH}/*.fq.gz
+do
+        fastqc -o ${QCPATH} $i
+done
