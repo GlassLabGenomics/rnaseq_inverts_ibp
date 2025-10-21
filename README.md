@@ -22,6 +22,12 @@ export LD_lIBRARY_PATH=/home/yhsieh/.local/easybuild/software/Miniforge3/24.11.3
 run_trimmomatic_array.sh
 ```
 
+or BBDUK
+
+```
+run_bbduk.sh
+```
+
 FASTQC
 
 ```
