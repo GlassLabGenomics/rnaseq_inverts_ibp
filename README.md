@@ -9,6 +9,8 @@ FASTQC
 run_fastqc_array.sh
 ```
 
+MULTIFASTQC
+
 TRIMMOMATIC 
 - if there is a java memory error, you need to load the java module after activating your mamba env, and give the full path as such:
 ```
@@ -33,6 +35,8 @@ FASTQC
 ```
 run_fastqc_array.sh
 ```
+
+MULTIFASTQC
 
 HISAT2
 - build index
