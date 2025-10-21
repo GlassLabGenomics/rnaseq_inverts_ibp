@@ -14,6 +14,10 @@ run_fastqc_array.sh
 ---
 
 MULTIQC
+- load the gombessa module MultiQC/1.28
+- navigate into your folder with all the fastqc files
+
+`multiqc --filename rnaseq_qc_report .`
 
 ---
 
