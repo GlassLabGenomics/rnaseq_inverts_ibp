@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=trim
 #SBATCH --partition=defq
-#SBATCH --cpus-per-task=8
-#SBATCH --mem-per-cpu=800MB
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=2GB
 #SBATCH --time=03:00:00
 
 set -o errexit

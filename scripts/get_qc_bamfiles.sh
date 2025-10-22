@@ -2,7 +2,7 @@
 #SBATCH --job-name=qualimap
 #SBATCH --partition=defq
 #SBATCH --cpus-per-task=8
-#SBATCH --mem-per-cpu=1GB
+#SBATCH --mem-per-cpu=2GB
 #SBATCH --time=04:00:00
 
 set -o errexit
@@ -19,8 +19,10 @@ OUTPATH="/export/scratch/yhsieh/rnaseq/alignments/qc_bamfiles"
 READSFILE=$1
 sampleID=$(awk "NR==$SLURM_ARRAY_TASK_ID" $READSFILE)
 
-echo "Running qualimap bamqc on ${sampleID}..."
+GTFFILE=$2
 
-qualimap bamqc -bam "${BAMPATH}/${sampleID}.bam" -outdir "${OUTPATH}/${sampleID}_qc" -nt 8
+echo "Running qualimap rnaseq on ${sampleID}..."
+
+qualimap rnaseq -bam "${BAMPATH}/${sampleID}.bam" -gtf "${GTFFILE}" -outdir "${OUTPATH}/${sampleID}_qc_rnaseq"  
 
 mamba deactivate
