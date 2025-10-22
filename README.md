@@ -5,9 +5,21 @@ Collection of scripts for RNA-seq analysis on intertidal inverts
 
 FASTQC
 
+---
+
 ```
 run_fastqc_array.sh
 ```
+
+---
+
+MULTIQC
+- load the gombessa module MultiQC/1.28
+- navigate into your folder with all the fastqc files
+
+`multiqc --filename rnaseq_qc_report .`
+
+---
 
 TRIMMOMATIC 
 - if there is a java memory error, you need to load the java module after activating your mamba env, and give the full path as such:
@@ -27,12 +39,18 @@ or BBDUK
 ```
 run_bbduk.sh
 ```
+---
 
 FASTQC
 
 ```
 run_fastqc_array.sh
 ```
+---
+
+MULTIQC
+
+---
 
 HISAT2
 - build index
@@ -41,12 +59,14 @@ HISAT2
 ```
 run_hisat2_array.sh
 ```
+---
 
 SAM to BAM conversion
 
 ```
 convert_sam_bam.sh
 ```
+---
 
 BEDTOOLS
 - bedgraph
@@ -54,12 +74,16 @@ BEDTOOLS
 ```
 run_bedtools_array.sh
 ```
-  
+
+---
+
 GENOME INDEX
 
 ```
 make_genome_idx.sh
 ```
+
+---
 
 BIGWIG
 
@@ -67,6 +91,7 @@ BIGWIG
 create_bigwig_bg.sh
 ```
 
+---
 QUALIMAP
 
 ```
