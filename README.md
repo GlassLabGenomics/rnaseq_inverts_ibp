@@ -57,6 +57,7 @@ HISAT2
 - run alignment
   
 ```
+build_hisat2_idx.sh
 run_hisat2_array.sh
 ```
 ---
