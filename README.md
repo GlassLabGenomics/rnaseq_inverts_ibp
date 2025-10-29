@@ -98,3 +98,15 @@ QUALIMAP
 ```
 get_qc_bamfiles.sh
 ```
+
+STRINGTIE
+
+join together sorted and mapped reads into transcripts
+
+GFFREAD
+
+sample command
+
+```
+gffread -w p_heli_tube_feet_transcripts.fa -g $SCRATCH/rnaseq/genomes/p_helianthoides/GCA_032158295.1_ASM3215829v1_genomic.fna p_heli_tube_feet.gtf
+```
