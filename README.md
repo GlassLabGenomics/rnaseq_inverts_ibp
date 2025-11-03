@@ -126,6 +126,7 @@ stringtie --merge UAFJRG0148_1.gtf UAFJRG0148_2.gtf UAFJRG0148_3.gtf -o p_heli_a
 
 </details>
 
+---
 GFFREAD
 
 pull out sequences corresponding to the genomic regions defined in GTF file per tissue per species
@@ -139,3 +140,13 @@ gffread -w p_heli_tube_feet_transcripts.fa -g $SCRATCH/rnaseq/genomes/p_helianth
 ```
 
 </details>
+
+---
+
+MAKEBLASTDB
+
+```
+sbatch single_genome_makeblastdb.sh /export/scratch/yhsieh/rnaseq/alignments/reads_truseq3pe_aln_seastar/transcriptome/p_heli_tissues/p_heli_ampullae_transcripts.fa /export/scratch/yhsieh/rnaseq/alignments/reads_truseq3pe_aln_seastar/transcriptome/p_heli_tissues/p_heli_ampullae_transcripts
+```
+
+TBLASTN
