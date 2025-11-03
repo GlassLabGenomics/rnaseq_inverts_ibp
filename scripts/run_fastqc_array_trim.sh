@@ -16,8 +16,8 @@ FILEWITHPATHS=$1
 filename=$(awk "NR==$SLURM_ARRAY_TASK_ID" $FILEWITHPATHS)
 
 ### set IO paths
-INPATH="/export/scratch/yhsieh/rnaseq/trimdata/${filename}"
-OUTPATH="/export/scratch/yhsieh/rnaseq/${2}"
+INPATH="/export/scratch/yhsieh/rnaseq/${2}/${filename}"
+OUTPATH="/export/scratch/yhsieh/rnaseq/${3}"
 
 echo "===== reading in fastqc files from ${INPATH}"
 fastqc -o ${OUTPATH} ${INPATH}

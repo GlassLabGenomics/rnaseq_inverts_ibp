@@ -13,11 +13,11 @@ module load Miniforge3/24.11.3-0
 source ~/.bashrc
 mamba activate bioenv
 
-INPATH="/export/scratch/yhsieh/rnaseq/trimdata_TruSeq3PE/paired"
-OUTPATH="/export/scratch/yhsieh/rnaseq/alignments"
+INPATH=$1 ##directory with reads
+OUTPATH=$2 ##directory to output summary and samfiles
 
-HISAT2IDX=$1
-READSFILE=$2
+HISAT2IDX=$3 ##give as prefix before .ht2
+READSFILE=$4 ##config file with reads corresponding to species
 sampleID=$(awk "NR==$SLURM_ARRAY_TASK_ID" $READSFILE)
 
 R1FQ="${sampleID}_trim_1P.fq.gz"
