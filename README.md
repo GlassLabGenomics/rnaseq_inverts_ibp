@@ -93,20 +93,49 @@ create_bigwig_bg.sh
 ```
 
 ---
-QUALIMAP
+QUALIMAP: `get_qc_bamfiles.sh`
+
+
+---
+STRINGTIE: `run_stringtie_single.sh`
+
+1. aggregate sorted-mapped reads into transcriptomes
+
+<details>
+
+<summary>sample command</summary>
 
 ```
-get_qc_bamfiles.sh
+sbatch --array=1-9 scripts/run_stringtie_single.sh alignments/reads_truseq3pe_aln_seastar/bamfiles alignments/reads_truseq3pe_aln_seastar/transcriptome alnconfigs/p_helianthoides_aln.config
 ```
 
-STRINGTIE
 
-join together sorted and mapped reads into transcripts
+</details>
+
+2. merge replicates for each tissue into one single tissue-based gtf
+
+<details>
+
+<summary>sample command</summary>
+
+```
+stringtie --merge UAFJRG0146_1.gtf UAFJRG0146_2.gtf UAFJRG0146_3.gtf -o p_heli_tube_feet.gtf
+stringtie --merge UAFJRG0147_1.gtf UAFJRG0147_2.gtf UAFJRG0147_3.gtf -o p_heli_pyloriccaeca.gtf
+stringtie --merge UAFJRG0148_1.gtf UAFJRG0148_2.gtf UAFJRG0148_3.gtf -o p_heli_ampullae.gtf
+```
+
+</details>
 
 GFFREAD
 
-sample command
+pull out sequences corresponding to the genomic regions defined in GTF file per tissue per species
+
+<details>
+
+<summary>sample command</summary>
 
 ```
 gffread -w p_heli_tube_feet_transcripts.fa -g $SCRATCH/rnaseq/genomes/p_helianthoides/GCA_032158295.1_ASM3215829v1_genomic.fna p_heli_tube_feet.gtf
 ```
+
+</details>
