@@ -3,18 +3,17 @@
 /*
  * Pipeline parameters
  */
-params.input_fasta = "${projectDir}/transcripts/*fa"
-// params.input_fasta = "${projectDir}/transcripts/p_heli_pyloriccaeca_transcripts.fa"
-params.outdir = "database"
+params.input_fastalist = "${projectDir}/transcripts_file.txt"
+params.outdir = "${projectDir}/database"
 params.dbtype = "nucl"
 
 /*
  * Print pipeline parameters
  */
 log.info """\
-    MAKE BLAST DBS PIPELINE
+    MAKE BLAST DATABASE PIPELINE
     ===================================
-    fasta file(s)  : ${params.input_fasta}
+    fasta file(s)  : ${params.input_fastalist}
     output folder  : ${params.outdir}
     database type  : ${params.dbtype}
     """
@@ -24,14 +23,20 @@ log.info """\
  * Create channels for input files
  */
 fasta_ch = Channel
-    .fromPath(params.input_fasta)
-    .map { file -> tuple(file.baseName, file) }
+    .fromPath(params.input_fastalist)
+    .splitText()
+    .map { it.trim() }
+    .map { filepath -> 
+        def inputfile = file(filepath)
+        def sampleid = inputfile.simpleName
+        return tuple(sampleid, filepath)
+    }
 
 /*
  * Generate blast db files
  */
 process MAKE_BLASTdb {
-
+    tag "$sample_id"
     publishDir params.outdir, mode: 'symlink'
 
     input:
