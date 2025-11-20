@@ -78,7 +78,11 @@ fasta_ch = Channel
  */
 process MAKE_BLASTdb {
     tag "$sample_id"
+<<<<<<< HEAD
     publishDir params.outdir, mode: 'move'
+=======
+    publishDir params.outdir, mode: 'symlink'
+>>>>>>> 5f27bb435a55cb020033c14d069e7b017961a519
 
     input:
         tuple val(sample_id), path(fasta)
