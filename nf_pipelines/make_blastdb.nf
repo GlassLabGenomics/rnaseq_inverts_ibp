@@ -20,6 +20,47 @@ log.info """\
     .stripIndent()
 
 /*
+ * Print help message
+ */
+def helpMessage() {
+    log.info"""
+    ================================================================
+    Make Blast Database Pipeline
+    ================================================================
+    
+    Usage:
+      nextflow run ${workflow.scriptName} --input_fastalist <file> 
+    
+    Required arguments:
+      --input_fastalist     Path to text file containing fasta file paths (one per line)
+    
+    Optional arguments:
+      -profile              Run with slurm profile in nextflow.config
+      --outdir              Output directory (default: ${params.outdir})
+      --dbtype              Type of database, 'nucl' or 'prot'
+                            (default: ${params.dbtype})
+      --help                Show this help message and exit
+    
+    SLURM configuration (check nextflow.config):
+      Partition:            defq
+      CPUs per task:        16
+      Memory per CPU:       100MB
+      Time limit:           3 hours
+    
+    Example:
+        nextflow run make_blastdb.nf -profile slurmlite -with-trace trace.txt
+    
+    ================================================================
+    """.stripIndent()
+}
+
+// Show help message if requested
+if (params.help) {
+    helpMessage()
+    exit 0
+}
+
+/*
  * Create channels for input files
  */
 fasta_ch = Channel
@@ -37,7 +78,7 @@ fasta_ch = Channel
  */
 process MAKE_BLASTdb {
     tag "$sample_id"
-    publishDir params.outdir, mode: 'symlink'
+    publishDir params.outdir, mode: 'move'
 
     input:
         tuple val(sample_id), path(fasta)
