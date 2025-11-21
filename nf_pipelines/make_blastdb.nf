@@ -1,23 +1,11 @@
 #!/usr/bin/env nextflow
 
 /*
- * Pipeline parameters
+ * Pipeline default parameters
  */
 params.input_fastalist = "${projectDir}/transcripts_file.txt"
 params.outdir = "${projectDir}/database"
 params.dbtype = "nucl"
-
-/*
- * Print pipeline parameters
- */
-log.info """\
-    MAKE BLAST DATABASE PIPELINE
-    ===================================
-    fasta file(s)  : ${params.input_fastalist}
-    output folder  : ${params.outdir}
-    database type  : ${params.dbtype}
-    """
-    .stripIndent()
 
 /*
  * Print help message
@@ -61,6 +49,18 @@ if (params.help) {
 }
 
 /*
+ * Print pipeline parameters
+ */
+log.info """\
+    MAKE BLAST DATABASE PIPELINE
+    ===================================
+    fasta file(s)  : ${params.input_fastalist}
+    output folder  : ${params.outdir}
+    database type  : ${params.dbtype}
+    """
+    .stripIndent()
+
+/*
  * Create channels for input files
  */
 fasta_ch = Channel
@@ -78,11 +78,7 @@ fasta_ch = Channel
  */
 process MAKE_BLASTdb {
     tag "$sample_id"
-<<<<<<< HEAD
     publishDir params.outdir, mode: 'move'
-=======
-    publishDir params.outdir, mode: 'symlink'
->>>>>>> 5f27bb435a55cb020033c14d069e7b017961a519
 
     input:
         tuple val(sample_id), path(fasta)
