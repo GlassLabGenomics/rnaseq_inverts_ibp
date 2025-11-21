@@ -66,15 +66,12 @@ db_ch = Channel
     publishDir "${params.outdir}/${sample_id}", mode: 'copy'
 
     input:
-    tuple val(sample_id), path(fasta_path)
-    each db_info
+    tuple val(sample_id), path(fasta_path), val(db_id), path(db_path)
 
     output:
     path "${sample_id}_vs_${db_id}.tsv"
 
     script:
-    def db_id = db_info[0]
-    def db_path = db_info[1]
     """
     #!/bin/bash
 
@@ -101,5 +98,6 @@ db_ch = Channel
  */
 
  workflow {
-    runBlast(query_ch, db_ch)
+    combined_ch = query_ch.combine(db_ch).view()
+    // runBlast(combined_ch)
  }
