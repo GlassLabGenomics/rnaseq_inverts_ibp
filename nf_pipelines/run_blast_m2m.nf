@@ -5,6 +5,7 @@
  */
 params.query_file = "${projectDir}/query_list.txt"
 params.db_file = "${projectDir}/database_list.txt"
+params.db_location = "${projectDir}/database"
 params.outdir = "${projectDir}/blast_results"
 params.blast_alg = "blastn"
 params.evalue = "1e-5"
@@ -29,6 +30,7 @@ if (params.help) {
     ===================================
     fasta files    : ${params.query_file}
     database list  : ${params.db_file}
+    database path  : ${params.db_location}
     blast type     : ${params.blast_alg}
     output dir     : ${params.outdir}
     e-value        : ${params.evalue}
@@ -53,10 +55,6 @@ db_ch = Channel
     .fromPath(params.db_file)
     .splitText()
     .map { it.trim() }
-    .map { filepath ->
-        def f = file(filepath)
-        tuple(f.simpleName, f)
-    }
 
  /*
  * Run blast for each query fasta against each database
@@ -66,7 +64,8 @@ db_ch = Channel
     publishDir "${params.outdir}/${sample_id}", mode: 'copy'
 
     input:
-    tuple val(sample_id), path(fasta_path), val(db_id), path(db_path)
+    tuple val(sample_id), path(fasta_path)
+    each db_id
 
     output:
     path "${sample_id}_vs_${db_id}.tsv"
@@ -81,10 +80,13 @@ db_ch = Channel
     module load OpenMPI/5.0.3
     module load BLAST+/2.16.0
 
+    # set path to look for db files
+    export BLASTDB="${params.db_location}"
+
     # run blast many-to-many
     ${params.blast_alg} \
         -query ${fasta_path} \
-        -db ${db_path} \
+        -db ${db_id} \
         -out "${sample_id}_vs_${db_id}.tsv" \
         -evalue ${params.evalue} \
         -max_target_seqs ${params.max_target_seqs} \
@@ -98,6 +100,5 @@ db_ch = Channel
  */
 
  workflow {
-    combined_ch = query_ch.combine(db_ch).view()
-    // runBlast(combined_ch)
+    runBlast(query_ch, db_ch)
  }
