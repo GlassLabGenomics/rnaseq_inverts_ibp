@@ -40,26 +40,23 @@ if (params.help) {
  /*
  * Create I/O channels
  */
- query_ch = Channel
+query_ch = Channel
     .fromPath(params.query_file)
     .splitText()
     .map { it.trim() }
     .map { filepath ->
-        def inputfile = file(filepath)
-        def sampleid = inputfile.simpleName
-        return tuple(sampleid, filepath)
+        def f = file(filepath)
+        tuple(f.simpleName, f)
     }
 
- db_ch = Channel
+db_ch = Channel
     .fromPath(params.db_file)
     .splitText()
     .map { it.trim() }
     .map { filepath ->
-        def searchdb = file(filepath)
-        def db_id = searchdb.simpleName
-        return tuple(db_id, filepath)
+        def f = file(filepath)
+        tuple(f.simpleName, f)
     }
-
 
  /*
  * Run blast for each query fasta against each database
@@ -70,12 +67,14 @@ if (params.help) {
 
     input:
     tuple val(sample_id), path(fasta_path)
-    each tuple(val(db_id), path(db_path))
+    each db_info
 
     output:
     path "${sample_id}_vs_${db_id}.tsv"
 
     script:
+    def db_id = db_info[0]
+    def db_path = db_info[1]
     """
     #!/bin/bash
 
@@ -95,7 +94,7 @@ if (params.help) {
         -outfmt ${params.outfmt} \
         -num_threads ${task.cpus}
     """
-
+ }
 
  /*
  * Workflow
