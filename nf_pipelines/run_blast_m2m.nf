@@ -16,6 +16,33 @@ params.outfmt = 7
 /*
  * Print help message
  */
+ def helpMessage() {
+    log.info"""
+    === Run Blast 'Many-to-Many': Fastas x DBs ===
+    
+    Usage:
+      nextflow run ${workflow.scriptName} [--query_file filewithfastapaths] [--db_file filewithdbnames] [--db_location path] [--outdir path]
+    
+    Example:
+        nextflow run make_blastdb.nf -profile slurmlite -with-trace trace.txt
+    
+    Required arguments (check defaults in the script):
+      --query_file  file with paths to fasta inputs
+      --db_file     file with database names (not paths)
+      --db_location path to database location (one folder only)
+      --outdir      path to output results
+    
+    Optional arguments:
+      -profile              run with slurm profile in nextflow.config
+      --outdir              output directory (default: ${params.outdir})
+      --blast_alg           'blastn', 'blastp', etc: default = ${params.blast_alg})
+      --evalue              default = ${params.evalue}
+      --max_target_seqs     default = ${params.max_target_seqs}
+      --outfmt              default = ${params.outfmt}
+      --help                show this help message and exit
+    """.stripIndent()
+}
+
  // Show help message if requested
 if (params.help) {
     helpMessage()
