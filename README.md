@@ -3,13 +3,13 @@
 This repo contains the workflow and constituent scripts for for RNA-seq analysis on intertidal inverts, as part of the ice-binding project.
 Current work is being done to extend the analyis to the differential expression calculation step, and wrap up the whole thing into a nextflow pipeline.
 
-Intermediate, modularized components of this pipeline can be found in the (nf_pipelines)[https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/tree/master/nf_pipelines] folder.
+Intermediate, modularized components of this pipeline can be found in the [nf_pipelines](https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/tree/master/nf_pipelines) folder.
 
 ### NF Modules
 
-1. Prepare collection of sequences as a BLAST-able database (-->)[https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/blob/master/nf_pipelines/make_blastdb.nf]
+1. Prepare collection of sequences as a BLAST-able database [-->](https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/blob/master/nf_pipelines/make_blastdb.nf)
 
-2. Run a many-to-many BLAST based on a user-defined set of sequences and databases (-->)[https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/blob/master/nf_pipelines/run_blast_m2m.nf] 
+2. Run a many-to-many BLAST based on a user-defined set of sequences and databases [-->](https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/blob/master/nf_pipelines/run_blast_m2m.nf)
 
 ### RNAseq Workflow (still to be modularized and wrapped into pipeline)
 
