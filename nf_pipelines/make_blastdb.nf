@@ -69,7 +69,7 @@ fasta_ch = Channel
     .map { it.trim() }
     .map { filepath -> 
         def inputfile = file(filepath)
-        def sampleid = inputfile.simpleName
+        def sampleid = inputfile.baseName
         return tuple(sampleid, filepath)
     }
 
