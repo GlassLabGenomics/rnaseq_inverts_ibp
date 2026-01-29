@@ -16,8 +16,7 @@ def helpMessage() {
     ================================================================
     
     Usage:
-      nextflow run ${workflow.scriptName} --input_folderlist <file> \
-                                          --outdir <dir>
+      nextflow run ${workflow.scriptName} --input_folderlist <file> --outdir <dir>
     
     Required arguments:
       --input_folderlist    Path to text file containing absolute 
