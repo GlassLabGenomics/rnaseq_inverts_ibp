@@ -1,11 +1,22 @@
 #!/usr/bin/python3
 """
-scatter_blast_tsv.py
+scatter_blast_tsv_batch.py
+
+To be run via summarise_blastres.nf
 
 Takes in a list of paths to folders containing tsv files.
 
 Parses each blast tsv file (fmt 7) into a pandas dataframe. 
 Visualises hits as a multifeature scatter plot in vega-altair.
+
+Does this PER PROTEIN to generate:
+1. summary file with how many hits to that protein per database
+2. scatter plot per protein of all hits, if non-zero nr. hits
+   one scatterplot per protein
+
+To-dos:
+[] put header info in to summary, at the parsing step return an additional metadata obj
+[] add additional specs to the summary, like average pid, aln length
 """
 
 from pathlib import Path
