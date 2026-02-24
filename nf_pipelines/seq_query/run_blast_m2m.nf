@@ -24,7 +24,7 @@ params.outfmt = 7
       nextflow run ${workflow.scriptName} [--query_file filewithfastapaths] [--db_file filewithdbnames] [--db_location path] [--outdir path]
     
     Example:
-        nextflow run make_blastdb.nf -profile slurmlite -with-trace trace.txt
+        nextflow run run_blast_m2m.nf -profile slurmlite -with-trace trace.txt
     
     Required arguments (check defaults in the script):
       --query_file  file with paths to fasta inputs
