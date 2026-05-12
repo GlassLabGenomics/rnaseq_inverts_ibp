@@ -87,6 +87,7 @@ db_ch = Channel
  * Run blast for each query fasta against each database
  */
  process runBlast {
+
     tag "${sample_id}_vs_${db_id}"
     publishDir "${params.outdir}/${sample_id}", mode: 'copy'
 
@@ -95,9 +96,10 @@ db_ch = Channel
     each db_id
 
     output:
-    path "${sample_id}_vs_${db_id}.tsv"
+    path "${sample_id}_vs_${db_id}.${ext}"
 
     script:
+    ext = (params.outfmt in [6, 7]) ? "tsv" : (params.outfmt in [5, 14, 16]) ? "xml" : "tab"
     """
     #!/bin/bash
 
@@ -114,7 +116,7 @@ db_ch = Channel
     ${params.blast_alg} \
         -query ${fasta_path} \
         -db ${db_id} \
-        -out "${sample_id}_vs_${db_id}.tsv" \
+        -out "${sample_id}_vs_${db_id}.${ext}" \
         -evalue ${params.evalue} \
         -max_target_seqs ${params.max_target_seqs} \
         -outfmt ${params.outfmt} \
