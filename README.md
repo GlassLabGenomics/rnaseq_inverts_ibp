@@ -1,132 +1,153 @@
 # rnaseq_invert_ibp
 
-This repo contains the workflow and constituent scripts for for RNA-seq analysis on intertidal inverts, as part of the ice-binding project.
-Current work is being done to extend the analyis to the differential expression calculation step, and wrap up the whole thing into a nextflow pipeline.
+RNA-seq analysis workflow for intertidal invertebrates, developed as part of the ice-binding protein (IBP) project. The pipeline covers raw read QC and trimming, genome alignment, transcript assembly, and BLAST-based sequence querying. Work is ongoing to extend the workflow through differential expression and to wrap the full pipeline in Nextflow.
 
-Intermediate, modularized components of this pipeline can be found in the [nf_pipelines](https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/tree/master/nf_pipelines) folder.
+Modular Nextflow components live in [`nf_pipelines/`](https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/tree/master/nf_pipelines). The remaining shell scripts (in [`scripts/`](https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/tree/master/scripts)) represent the step-by-step workflow and have not yet been wrapped into the pipeline. Check on the status below for more information.
 
-### NF Modules
-
-1. Prepare collection of sequences as a BLAST-able database [-->](https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/blob/master/nf_pipelines/make_blastdb.nf)
-
-2. Run a many-to-many BLAST based on a user-defined set of sequences and databases [-->](https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/blob/master/nf_pipelines/run_blast_m2m.nf)
-
-### RNAseq Workflow (still to be modularized and wrapped into pipeline)
-
-FASTQC
-
----
+## Repository Structure
 
 ```
-run_fastqc_array.sh
+├── images/               # QC comparison plots (adapter content)
+├── nf_pipelines/         # Nextflow pipeline modules
+│   └── seq_query/        # make_blastdb.nf, run_blast_m2m.nf
+├── scripts/              # Shell scripts for each workflow step
+├── README.md
+└── useful_links_and_literature.md
 ```
 
----
+## Status
 
-MULTIQC
-- load the gombessa module MultiQC/1.28
-- navigate into your folder with all the fastqc files
+| Component | Status |
+| -------- | -------- |
+| QC → Alignment → StringTie → gffread | Working |
+| LAST database build (NF module) | Working |
+| Many-to-many BLAST (NF module) | Working |
+| Differential expression | In progress |
+| Full pipeline Nextflow wrapper | In progress | 
 
-`multiqc --filename rnaseq_qc_report .`
 
----
+## Environment Setup
 
-TRIMMOMATIC 
-- if there is a java memory error, you need to load the java module after activating your mamba env, and give the full path as such:
+All bioinformatics tools are managed via `conda/mamba`. The primary environment is `bioenv`; a separate `env_nf` environment is used for running Nextflow pipelines. Activate the corresponding environment depending on what you want to do.
+
+```bash
+# Activate the main analysis environment
+mamba activate bioenv
+
+# Or, activate the Nextflow environment
+mamba activate env_nf
 ```
+
+Key tools installed in `bioenv`: `hisat2, samtools, trimmomatic, bbtools, stringtie, gffread, qualimap, bedtools, salmon, mafft, iqtree`
+
+Note on Trimmomatic Java errors on Gombessa: If you hit a Java memory error, load the Java module after activating bioenv and set the library path manually:
+```bash
 module load Java/21.0.5
-export LD_lIBRARY_PATH=/home/yhsieh/.local/easybuild/software/Miniforge3/24.11.3-0/envs/bioenv/lib/jvm/lib/
+export LD_LIBRARY_PATH=/home/yhsieh/.local/easybuild/software/Miniforge3/24.11.3-0/envs/bioenv/lib/jvm/lib/
 ```
-- not sure why this is an error now on gombessa
-- reduce nr of threads to 4 and cpu to 1
+Also reduce threads to 4 and CPUs to 1 in the Trimmomatic script.
 
-```
-run_trimmomatic_array.sh
-```
+## Nextflow Modules [(`nf_pipelines/`)](https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/tree/master/nf_pipelines)
+Ready-to-run modular pipelines. Requires `env_nf`.
 
-or BBDUK
+1. Build a BLAST database: Takes a list of FASTA file paths and builds BLAST-searchable databases.
 
 ```
-run_bbduk.sh
-```
----
-
-FASTQC
-
-```
-run_fastqc_array.sh
-```
----
-
-MULTIQC
-
----
-
-HISAT2
-- build index
-- run alignment
-  
-```
-build_hisat2_idx.sh
-run_hisat2_array.sh
-```
----
-
-SAM to BAM conversion
-
-```
-convert_sam_bam.sh
-```
----
-
-BEDTOOLS
-- bedgraph
-
-```
-run_bedtools_array.sh
+nextflow run nf_pipelines/seq_query/make_blastdb.nf \
+  --input_fastalist <path/to/fasta_list.txt> \
+  --outdir <path/to/blast_dbs>
 ```
 
----
-
-GENOME INDEX
+2. Run many-to-many BLAST: Runs a BLAST search for each query sequence against each database in the provided lists. Supports `blastn, tblastn`, and other BLAST algorithms.
 
 ```
-make_genome_idx.sh
+nextflow run nf_pipelines/seq_query/run_blast_m2m.nf \
+  --query_file   <path/to/query_list.txt> \
+  --db_file      <path/to/database_names.txt> \
+  --db_location  <path/to/blast_dbs/> \
+  --outdir       <path/to/output/> \
+  --blast_alg    tblastn \
+  --outfmt       7        # optional; default is tabular (6)
 ```
 
----
+Output is organized as `<outdir>/<query_name>/<query>_vs_<db>.tsv`
 
-BIGWIG
+## RNAseq Workflow [(`scripts/`)](https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/tree/master/scripts)
+Run steps in order. Array jobs submit one task per sample; single-sample scripts are available for testing.
 
-```
-create_bigwig_bg.sh
-```
+#### Step 1 — Quality Control (raw reads)
 
----
-QUALIMAP: `get_qc_bamfiles.sh`
+`sbatch --array=1-N scripts/run_fastqc_array.sh`
 
-
----
-STRINGTIE: `run_stringtie_single.sh`
-
-1. aggregate sorted-mapped reads into transcriptomes
-
-<details>
-
-<summary>sample command</summary>
+Then run MultiQC to aggregate reports:
 
 ```
-sbatch --array=1-9 scripts/run_stringtie_single.sh alignments/reads_truseq3pe_aln_seastar/bamfiles alignments/reads_truseq3pe_aln_seastar/transcriptome alnconfigs/p_helianthoides_aln.config
+# Load MultiQC module (Gombessa: MultiQC/1.28)
+# navigate to your folder with all the fastqc files
+multiqc --filename rnaseq_qc_report_raw .
 ```
 
+#### Step 2 — Adapter Trimming
 
-</details>
+**Option A: Trimmomatic**
 
-2. merge replicates for each tissue into one single tissue-based gtf
+`sbatch --array=1-N scripts/run_trimmomatic_array.sh`
 
-<details>
+**Option B: BBDuk** see Wiki for discussion of comparison between the two
 
-<summary>sample command</summary>
+`sbatch scripts/run_bbduk.sh`
+
+#### Step 3 — Quality Control (trimmed reads)
+
+```
+sbatch --array=1-N scripts/run_fastqc_array.sh   # or run_fastqc_array_trim.sh
+multiqc --filename rnaseq_qc_report_trimmed .
+```
+
+#### Step 4 - Genome Alignment (HISAT2)
+
+Build the genome index (run once per genome):
+
+`sbatch scripts/build_hisat2_idx.sh <genome.fna> <index_prefix>`
+
+Run alignment: 
+
+`sbatch --array=1-N scripts/run_hisat2_array.sh`
+
+#### Step 5 - SAM to BAM conversion
+
+`sbatch scripts/convert_sam_bam.sh <list_of_sam_basenames.txt>`
+
+#### Step 6 - Coverage Tracks (optional)
+
+Generate bedGraph files:
+
+`sbatch --array=1-N scripts/run_bedtools_array.sh`
+
+Build genome index for bigWig conversion:
+
+`sbatch scripts/make_genome_idx.sh`
+
+Convert bedGraph to bigWig:
+
+`sbatch scripts/create_bigwig_bg.sh`
+
+#### Step 7 - BAM QC (Qualimap)
+
+`sbatch scripts/get_qc_bamfiles.sh`
+
+#### Step 8 - Transcript Assembly (StringTie)
+
+**8a. Assemble transcripts per sample**
+
+```
+sbatch --array=1-9 scripts/run_stringtie_single.sh \
+  alignments/reads_truseq3pe_aln_seastar/bamfiles \
+  alignments/reads_truseq3pe_aln_seastar/transcriptome \
+  alnconfigs/p_helianthoides_aln.config
+```
+
+**8b. Merge replicate GTFs per tissue**
 
 ```
 stringtie --merge UAFJRG0146_1.gtf UAFJRG0146_2.gtf UAFJRG0146_3.gtf -o p_heli_tube_feet.gtf
@@ -134,29 +155,25 @@ stringtie --merge UAFJRG0147_1.gtf UAFJRG0147_2.gtf UAFJRG0147_3.gtf -o p_heli_p
 stringtie --merge UAFJRG0148_1.gtf UAFJRG0148_2.gtf UAFJRG0148_3.gtf -o p_heli_ampullae.gtf
 ```
 
-</details>
+#### Step 9 — Extract Transcript Sequences (gffread)
 
----
-GFFREAD
-
-pull out sequences corresponding to the genomic regions defined in GTF file per tissue per species
-
-<details>
-
-<summary>sample command</summary>
+Pull FASTA sequences for genomic regions defined in each tissue GTF:
 
 ```
-gffread -w p_heli_tube_feet_transcripts.fa -g $SCRATCH/rnaseq/genomes/p_helianthoides/GCA_032158295.1_ASM3215829v1_genomic.fna p_heli_tube_feet.gtf
+gffread -w p_heli_tube_feet_transcripts.fa \
+  -g /path/to/genome/GCA_032158295.1_ASM3215829v1_genomic.fna \
+  p_heli_tube_feet.gtf
 ```
 
-</details>
-
----
-
-MAKEBLASTDB
+#### Step 10 - Make BLAST Databases from Transcripts
 
 ```
-sbatch single_genome_makeblastdb.sh /export/scratch/yhsieh/rnaseq/alignments/reads_truseq3pe_aln_seastar/transcriptome/p_heli_tissues/p_heli_ampullae_transcripts.fa /export/scratch/yhsieh/rnaseq/alignments/reads_truseq3pe_aln_seastar/transcriptome/p_heli_tissues/p_heli_ampullae_transcripts
+sbatch scripts/single_genome_makeblastdb.sh \
+  /path/to/p_heli_ampullae_transcripts.fa \
+  /path/to/p_heli_ampullae_transcripts
 ```
 
-TBLASTN
+### Step 11 - BLAST Query (tBLASTn / BLASTn)
+Use the `run_blast_m2m.nf` Nextflow module (see above) or run single queries manually:
+
+`sbatch scripts/search_nuclseq_in_alltissue_transcripts.sh`
