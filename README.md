@@ -28,7 +28,7 @@ Modular Nextflow components live in [`nf_pipelines/`](https://github.com/GlassLa
 
 ## Environment Setup
 
-All bioinformatics tools are managed via `conda/mamba`. The primary environment is `bioenv`; a separate `env_nf` environment is used for running Nextflow pipelines. Activate the corresponding environment depending on what you want to do.
+All bioinformatics tools are managed via `conda/mamba`. The primary environment is `bioenv`; a separate `env_nf` environment is used for running Nextflow pipelines. Send me an email if you want an exact copy of these environments, or else create the environments on your own machine. Activate the corresponding environment depending on what you want to do.
 
 ```bash
 # Activate the main analysis environment
