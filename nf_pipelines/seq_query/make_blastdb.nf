@@ -42,37 +42,6 @@ def helpMessage() {
     """.stripIndent()
 }
 
-// Show help message if requested
-if (params.help) {
-    helpMessage()
-    exit 0
-}
-
-/*
- * Print pipeline parameters
- */
-log.info """\
-    MAKE BLAST DATABASE PIPELINE
-    ===================================
-    fasta file(s)  : ${params.input_fastalist}
-    output folder  : ${params.outdir}
-    database type  : ${params.dbtype}
-    """
-    .stripIndent()
-
-/*
- * Create channels for input files
- */
-fasta_ch = Channel
-    .fromPath(params.input_fastalist)
-    .splitText()
-    .map { it.trim() }
-    .map { filepath -> 
-        def inputfile = file(filepath)
-        def sampleid = inputfile.baseName
-        return tuple(sampleid, filepath)
-    }
-
 /*
  * Generate blast db files
  */
@@ -111,13 +80,34 @@ process MAKE_BLASTdb {
 }
 
 workflow {
+   // Show help message if requested
+    if (params.help) {
+        helpMessage()
+        exit 0
+    }
+    /*
+     * Create channels for input files
+     */
+    fasta_ch = Channel
+        .fromPath(params.input_fastalist)
+        .splitText()
+        .map { it.trim() }
+        .map { filepath -> 
+            def inputfile = file(filepath)
+            def sampleid = inputfile.baseName
+            return tuple(sampleid, filepath)
+        }
+    /*
+     * Print pipeline parameters
+     */
+    log.info """\
+        MAKE BLAST DATABASE PIPELINE
+        ===================================
+        fasta file(s)  : ${params.input_fastalist}
+        output folder  : ${params.outdir}
+        database type  : ${params.dbtype}
+        """.stripIndent()
 
     // Create index file for input BAM file
     MAKE_BLASTdb(fasta_ch)
-}
-
-workflow.onComplete {
-    log.info "Pipeline completed at: $workflow.complete"
-    log.info "Execution status: ${ workflow.success ? 'OK' : 'failed' }"
-    log.info "Results directory: ${params.outdir}"
 }
