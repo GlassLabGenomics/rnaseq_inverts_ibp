@@ -53,16 +53,7 @@ process MAKE_BLASTdb {
         tuple val(sample_id), path(fasta)
 
     output:
-        tuple val(sample_id), path("${sample_id}_db.ndb")
-        tuple val(sample_id), path("${sample_id}_db.nhr")
-        tuple val(sample_id), path("${sample_id}_db.nin")
-        tuple val(sample_id), path("${sample_id}_db.njs")
-        tuple val(sample_id), path("${sample_id}_db.nog")
-        tuple val(sample_id), path("${sample_id}_db.nos")
-        tuple val(sample_id), path("${sample_id}_db.not")
-        tuple val(sample_id), path("${sample_id}_db.nsq")
-        tuple val(sample_id), path("${sample_id}_db.ntf")
-        tuple val(sample_id), path("${sample_id}_db.nto")
+        tuple val(sample_id), path("${sample_id}_db.*")
 
     script:
     """
