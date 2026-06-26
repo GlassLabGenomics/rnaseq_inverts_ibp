@@ -31,35 +31,6 @@ def helpMessage() {
     """.stripIndent()
 }
 
-// Show help message if requested
-if (params.help) {
-    helpMessage()
-    exit 0
-}
-
-/*
- * Print pipeline parameters
- */
-log.info """\
-    SUMMARISE BLAST PIPELINE
-    ===================================
-    fasta file(s)  : ${params.input_folderlist}
-    output folder  : ${params.outdir}
-    """
-    .stripIndent()
-
-/*
- * Create channels for input folders
- */
-folder_ch = Channel
-    .fromPath(params.input_folderlist)
-    .splitText()
-    .map { it.trim() }
-    .map { folderpath -> 
-        def folder = file(folderpath)
-        def foldername = folder.baseName
-        return tuple(foldername, folderpath)
-    }
 
 /*
  * Generate blast db files
@@ -85,13 +56,35 @@ process SUMMARISE_Blasthits {
 }
 
 workflow {
+    // Show help message if requested
+    if (params.help) {
+        helpMessage()
+        exit 0
+    }
+    /*
+    * Print pipeline parameters
+    */
+    log.info """\
+        SUMMARISE BLAST PIPELINE
+        ===================================
+        fasta file(s)  : ${params.input_folderlist}
+        output folder  : ${params.outdir}
+        """
+        .stripIndent()
+
+    /*
+    * Create channels for input folders
+    */
+    folder_ch = Channel
+        .fromPath(params.input_folderlist)
+        .splitText()
+        .map { it.trim() }
+        .map { folderpath -> 
+            def folder = file(folderpath)
+            def foldername = folder.baseName
+            return tuple(foldername, folderpath)
+        }
 
     // Create index file for input BAM file
     SUMMARISE_Blasthits(folder_ch)
-}
-
-workflow.onComplete {
-    log.info "Pipeline completed at: $workflow.complete"
-    log.info "Execution status: ${ workflow.success ? 'OK' : 'failed' }"
-    log.info "Results directory: ${params.outdir}"
 }
