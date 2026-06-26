@@ -43,63 +43,23 @@ params.outfmt = 7
     """.stripIndent()
 }
 
- // Show help message if requested
-if (params.help) {
-    helpMessage()
-    exit 0
-}
-
-/*
- * Print pipeline parameters
- */
- log.info """\
-    BLAST MANY-to-MANY PIPELINE
-    ===================================
-    fasta files    : ${params.query_file}
-    database list  : ${params.db_file}
-    database path  : ${params.db_location}
-    blast type     : ${params.blast_alg}
-    output dir     : ${params.outdir}
-    e-value        : ${params.evalue}
-    max targets    : ${params.max_target_seqs}
-    output format  : ${params.outfmt}
-    """
-    .stripIndent()
-
- /*
- * Create I/O channels
- */
-query_ch = Channel
-    .fromPath(params.query_file)
-    .splitText()
-    .map { it.trim() }
-    .map { filepath ->
-        def f = file(filepath)
-        tuple(f.simpleName, f)
-    }
-
-db_ch = Channel
-    .fromPath(params.db_file)
-    .splitText()
-    .map { it.trim() }
-
  /*
  * Run blast for each query fasta against each database
  */
  process runBlast {
 
     tag "${sample_id}_vs_${db_id}"
-    publishDir "${params.outdir}/${sample_id}", mode: 'copy'
+    publishDir { "${params.outdir}/${sample_id}" }, mode: 'copy'
 
     input:
     tuple val(sample_id), path(fasta_path)
     each db_id
+    val ext
 
     output:
     path "${sample_id}_vs_${db_id}.${ext}"
 
     script:
-    ext = (params.outfmt in [6, 7]) ? "tsv" : (params.outfmt in [5, 14, 16]) ? "xml" : "tab"
     """
     #!/bin/bash
 
@@ -129,5 +89,43 @@ db_ch = Channel
  */
 
  workflow {
-    runBlast(query_ch, db_ch)
+    // Show help message if requested
+    if (params.help) {
+        helpMessage()
+        exit 0
+    }
+    /*
+    * Print pipeline parameters
+     */
+     log.info """\
+        BLAST MANY-to-MANY PIPELINE
+        ===================================
+        fasta files    : ${params.query_file}
+        database list  : ${params.db_file}
+        database path  : ${params.db_location}
+        blast type     : ${params.blast_alg}
+        output dir     : ${params.outdir}
+        e-value        : ${params.evalue}
+        max targets    : ${params.max_target_seqs}
+        output format  : ${params.outfmt}
+        """.stripIndent()
+    /*
+    * Create I/O channels
+    */
+    query_ch = Channel
+        .fromPath(params.query_file)
+        .splitText()
+        .map { it.trim() }
+        .map { filepath ->
+            def f = file(filepath)
+            tuple(f.simpleName, f)
+        }
+
+    db_ch = Channel
+        .fromPath(params.db_file)
+        .splitText()
+        .map { it.trim() }
+
+    def ext = (params.outfmt in [6, 7]) ? "tsv" : (params.outfmt in [5, 14, 16]) ? "xml" : "tab"
+    runBlast(query_ch, db_ch, ext)
  }
