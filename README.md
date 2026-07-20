@@ -10,6 +10,7 @@ Modular Nextflow components live in [`nf_pipelines/`](https://github.com/GlassLa
 ├── images/               # QC comparison plots (adapter content)
 ├── nf_pipelines/         # Nextflow pipeline modules
 │   └── seq_query/        # make_blastdb.nf, run_blast_m2m.nf
+│   └── query_summary/    # summarise_blastres.nf
 ├── scripts/              # Shell scripts for each workflow step
 ├── README.md
 └── useful_links_and_literature.md
@@ -177,3 +178,6 @@ sbatch scripts/single_genome_makeblastdb.sh \
 Use the `run_blast_m2m.nf` Nextflow module (see above) or run single queries manually:
 
 `sbatch scripts/search_nuclseq_in_alltissue_transcripts.sh`
+
+
+### Step 12 - Generate summaries of each file
