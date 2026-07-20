@@ -174,7 +174,7 @@ sbatch scripts/single_genome_makeblastdb.sh \
   /path/to/p_heli_ampullae_transcripts
 ```
 
-## BLAST Search Workflow
+## BLAST Search Workflow (see Nextflow pipeline segment above, [(`nf_pipelines/`)](https://github.com/GlassLabGenomics/rnaseq_inverts_ibp/tree/master/nf_pipelines))
 
 ### Step 11 - BLAST Query (tBLASTn / BLASTn)
 Use the `run_blast_m2m.nf` Nextflow module (see above) or run single queries manually:
