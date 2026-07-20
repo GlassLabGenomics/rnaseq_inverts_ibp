@@ -180,4 +180,6 @@ Use the `run_blast_m2m.nf` Nextflow module (see above) or run single queries man
 `sbatch scripts/search_nuclseq_in_alltissue_transcripts.sh`
 
 
-### Step 12 - Generate summaries of each file
+
+### Step 12 - Summarise BLAST Results
+Use the `summarise_blastres.nf` Nextflow module (see above) to summarise and visualise the BLAST `.tsv` files produced in Step 11. For each query protein, it reports hit counts per database (`*_hits_summary.tsv`) and, for any query/database pair with hits, an interactive scatter plot of alignment length vs. percent identity (`*_scatter.html`, `pident >= 30`).
